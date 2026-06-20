@@ -1,0 +1,5 @@
+{ ... }:
+{
+  profiles.jvm.enable = false;
+  profiles.docker.enable = false;
+}
