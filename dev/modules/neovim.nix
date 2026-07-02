@@ -1,14 +1,19 @@
-{ pkgs, inputs, lib, osConfig, ... }:
+{
+  pkgs,
+  inputs,
+  lib,
+  osConfig,
+  ...
+}:
 
 let
   kotlin-lsp = pkgs.stdenv.mkDerivation rec {
-    pname = "kotlin-lsp";
-    version = "261.13587.0";
+    pname = "intellij-server";
+    version = "262.8190.0";
 
     src = pkgs.fetchzip {
-      url = "https://download-cdn.jetbrains.com/kotlin-lsp/${version}/kotlin-lsp-${version}-linux-aarch64.zip";
-      hash = "sha256-MhHEYHBctaDH9JVkN/guDCG1if9Bip1aP3n+JkvHCvA=";
-      stripRoot = false;
+      url = "https://download-cdn.jetbrains.com/language-server/kotlin-server/${version}/kotlin-server-${version}-aarch64.tar.gz";
+      hash = "sha256-SZ/Fjoe5fz8G7OBiTlRKwD8cVLrc674ptSYJ9T/XWic=";
     };
 
     nativeBuildInputs = [
@@ -17,7 +22,6 @@ let
     ];
 
     buildInputs = [
-      pkgs.jdk21
       pkgs.alsa-lib
       pkgs.freetype
       pkgs.libgcc.lib
@@ -25,6 +29,7 @@ let
       pkgs.libxi
       pkgs.libxrender
       pkgs.libxtst
+      pkgs.libxkbcommon
       pkgs.wayland
       pkgs.zlib
     ];
@@ -35,34 +40,14 @@ let
     installPhase = ''
       runHook preInstall
 
-      # 1. Setup directories
       mkdir -p $out/lib/kotlin-lsp $out/bin
-      cp -r * $out/lib/kotlin-lsp
+      cp -r . $out/lib/kotlin-lsp
+      chmod +x $out/lib/kotlin-lsp/bin/intellij-server
 
-      # 2. Symlink the Nix JDK to 'jre'
-      #    We replace the bundled JRE with a link to the system JDK.
-      rm -rf $out/lib/kotlin-lsp/jre
-      ln -s ${pkgs.jdk21}/lib/openjdk $out/lib/kotlin-lsp/jre
-
-      # 3. Patch the startup script
-      #    Stop it from trying to 'chmod' the read-only java binary.
-      substituteInPlace $out/lib/kotlin-lsp/kotlin-lsp.sh \
-        --replace 'chmod +x' '# chmod +x'
-
-      # 4. Make the startup script executable (Crucial Step!)
-      chmod +x $out/lib/kotlin-lsp/kotlin-lsp.sh
-
-      # 5. Create the wrapper
-      #    We use makeWrapper to create a binary in $out/bin that calls the script in $out/lib.
-      #    We also inject the PATH and JAVA_HOME here.
-      makeWrapper $out/lib/kotlin-lsp/kotlin-lsp.sh $out/bin/kotlin-lsp \
-        --set JAVA_HOME "${pkgs.jdk21}/lib/openjdk" \
+      makeWrapper $out/lib/kotlin-lsp/bin/intellij-server $out/bin/intellij-server \
         --prefix PATH : ${
           pkgs.lib.makeBinPath [
-            pkgs.jdk17
-            pkgs.jdk21
             pkgs.coreutils
-            pkgs.bash
             pkgs.git
           ]
         }

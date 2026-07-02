@@ -44,6 +44,9 @@
         home-manager.nixosModules.home-manager
         ./profile.nix
         ./modules/docker.nix
+        ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
+          vzm.proxy.java.enable = true;
+        })
       ] ++ (if builtins.pathExists ./local.nix then [ ./local.nix ] else [ ]) ++ [
         ({ pkgs, ... }: {
           home-manager.useGlobalPkgs = true;
