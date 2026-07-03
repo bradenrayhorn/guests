@@ -18,7 +18,6 @@ let
 
     nativeBuildInputs = [
       pkgs.autoPatchelfHook
-      pkgs.makeWrapper
     ];
 
     buildInputs = [
@@ -44,13 +43,35 @@ let
       cp -r . $out/lib/kotlin-lsp
       chmod +x $out/lib/kotlin-lsp/bin/intellij-server
 
-      makeWrapper $out/lib/kotlin-lsp/bin/intellij-server $out/bin/intellij-server \
-        --prefix PATH : ${
-          pkgs.lib.makeBinPath [
-            pkgs.coreutils
-            pkgs.git
-          ]
-        }
+      cat > $out/bin/intellij-server <<EOF
+      #!${pkgs.runtimeShell}
+      set -euo pipefail
+
+      kotlin_lsp_home="\''${KOTLIN_LSP_HOME:-\''${XDG_DATA_HOME:-\$HOME/.local/share}/kotlin-lsp}"
+      mkdir -p "\$kotlin_lsp_home"/{config,system,plugins,log}
+
+      # The JetBrains launcher falls back to /tmp idea-system dirs in this Nix
+      # package unless we provide writable persistent paths.  Keep all IntelliJ
+      # state under one base directory and pass it via JetBrains' stable
+      # idea.properties mechanism instead of baking every path into JVM args.
+      cat > "\$kotlin_lsp_home/idea.properties" <<PROPS
+      idea.config.path=\$kotlin_lsp_home/config
+      idea.system.path=\$kotlin_lsp_home/system
+      idea.plugins.path=\$kotlin_lsp_home/plugins
+      idea.log.path=\$kotlin_lsp_home/log
+      PROPS
+
+      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -Didea.properties.file=\$kotlin_lsp_home/idea.properties"
+      export PATH="${
+        pkgs.lib.makeBinPath [
+          pkgs.coreutils
+          pkgs.git
+        ]
+      }\''${PATH:+:\$PATH}"
+
+      exec $out/lib/kotlin-lsp/bin/intellij-server "\$@"
+      EOF
+      chmod +x $out/bin/intellij-server
 
       runHook postInstall
     '';
