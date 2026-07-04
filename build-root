@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+if [[ $# -ne 2 ]]; then
+  echo "usage: $0 <guest-dir> <root-name>" >&2
+  echo "example: $0 work work-root" >&2
+  exit 1
+fi
+
+SCRIPT_DIR="$(cd -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd)"
+DEV_DIR="$SCRIPT_DIR/dev"
+OVERLAY_DIR="$SCRIPT_DIR/$1"
+LOCAL_NIX="$OVERLAY_DIR/local.nix"
+ROOT_NAME="$2"
+
+if [[ ! -d "$DEV_DIR" ]]; then
+  echo "missing dev dir: $DEV_DIR" >&2
+  exit 1
+fi
+
+if [[ ! -d "$OVERLAY_DIR" ]]; then
+  echo "missing guest dir: $OVERLAY_DIR" >&2
+  exit 1
+fi
+
+if [[ ! -f "$LOCAL_NIX" ]]; then
+  echo "missing local.nix: $LOCAL_NIX" >&2
+  exit 1
+fi
+
+TMP_DIR="$(mktemp -d "${TMPDIR:-/tmp}/vzm-${ROOT_NAME}-XXXXXX")"
+cleanup() {
+  rm -rf "$TMP_DIR"
+}
+trap cleanup EXIT
+
+if command -v rsync >/dev/null 2>&1; then
+  rsync -a --exclude 'local.nix' "$DEV_DIR/" "$TMP_DIR/"
+else
+  cp -R "$DEV_DIR/." "$TMP_DIR/"
+  rm -f "$TMP_DIR/local.nix"
+fi
+
+cp "$LOCAL_NIX" "$TMP_DIR/local.nix"
+
+echo "Building root '$ROOT_NAME' from temp guest: $TMP_DIR" >&2
+exec vzm build-root "$TMP_DIR" "$ROOT_NAME"
