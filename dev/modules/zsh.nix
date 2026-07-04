@@ -8,6 +8,11 @@
     enable = true;
     initContent = lib.mkOrder 1000 ''
       export PRETTIERD_LOCAL_PRETTIER_ONLY=true
+      if [ -d /caches ]; then
+        export GRADLE_USER_HOME=/caches/gradle
+        export PNPM_HOME=/caches/pnpm
+      fi
+      ${builtins.readFile ./scripts/g.sh}
     '';
     plugins = [
       {

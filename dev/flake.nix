@@ -43,7 +43,9 @@
         vzm-guest.nixosModules.braden
         home-manager.nixosModules.home-manager
         ./profile.nix
+        ./modules/envs.nix
         ./modules/docker.nix
+        ./modules/persist.nix
         ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
           vzm.proxy.java.enable = true;
         })

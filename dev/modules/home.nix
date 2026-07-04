@@ -1,8 +1,13 @@
 {
   pkgs,
   pkgs-unstable,
+  osConfig,
+  lib,
   ...
 }:
+let
+  piAgent = import ./pi.nix { inherit pkgs pkgs-unstable; };
+in
 {
   imports = [
     ./git.nix
@@ -16,16 +21,20 @@
   home.homeDirectory = "/home/braden";
 
   home.sessionVariables = {
-    GRADLE_USER_HOME = "/var/gradle";
-    PNPM_HOME = "/var/pnpm";
+    NPM_CONFIG_USERCONFIG = "/persist/npm/.npmrc";
   };
 
   home.packages = [
-    pkgs-unstable.pi-coding-agent
-
+    piAgent
+    pkgs.ripgrep
+    pkgs.fzf
     pkgs.jq
     pkgs.curl
   ];
+
+  home.file = lib.optionalAttrs osConfig.profiles.jvm.enable {
+    "jdks/jdk21".source = "${pkgs.jdk21}/lib/openjdk";
+  };
 
   home.stateVersion = "26.05";
 }
