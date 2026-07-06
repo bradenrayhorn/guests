@@ -6,11 +6,9 @@ g() {
   case "$cmd" in
     switch)
       local target
-      target=$(find /data/git -type d \( -name .git -prune -o -print \) 2>/dev/null | \
-        while read -r path; do
-          if git -C "$path" rev-parse --is-inside-work-tree >/dev/null 2>&1; then
-            echo "$path"
-          fi
+      target=$(find /data/git -type d -name .git -prune 2>/dev/null | \
+        while read -r git_dir; do
+          dirname "$git_dir"
         done | \
         fzf --prompt="repo > ")
 
