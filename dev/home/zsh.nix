@@ -12,6 +12,16 @@
         export GRADLE_USER_HOME=/caches/gradle
         export PNPM_HOME=/caches/pnpm
       fi
+
+      persist_gradle_home=/persist/.gradle
+      persist_gradle_properties=$persist_gradle_home/gradle.properties
+      active_gradle_home=''${GRADLE_USER_HOME:-$HOME/.gradle}
+      mkdir -p "$persist_gradle_home" "$active_gradle_home"
+      if [ ! -e "$persist_gradle_properties" ]; then
+        touch "$persist_gradle_properties"
+      fi
+      ln -snf "$persist_gradle_properties" "$active_gradle_home/gradle.properties"
+
       ${builtins.readFile ./scripts/g.sh}
     '';
     plugins = [

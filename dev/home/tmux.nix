@@ -15,6 +15,9 @@
       set -g pane-active-border-style bg=default,fg=color249
       set -g pane-border-style fg=color240
 
+      set -g extended-keys on
+      set -g extended-keys-format csi-u
+
       set -g history-limit 50000
       set -g base-index 1
       set-option -g renumber-windows on
