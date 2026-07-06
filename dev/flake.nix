@@ -32,38 +32,55 @@
     }@inputs:
     let
       system = "aarch64-linux";
-
-      pkgs-unstable = import nixpkgs-unstable {
-        inherit system;
-        config.allowUnfree = true;
-      };
-
-      modules = [
-        vzm-guest.nixosModules.base
-        vzm-guest.nixosModules.braden
-        home-manager.nixosModules.home-manager
-        ./profile.nix
-        ./nixos/envs.nix
-        ./nixos/docker.nix
-        ./nixos/persist.nix
-        ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
-          vzm.proxy.java.enable = true;
-        })
-      ] ++ (if builtins.pathExists ./local.nix then [ ./local.nix ] else [ ]) ++ [
+    in
+    {
+      nixosModules.default =
+        { pkgs, ... }:
+        let
+          pkgs-unstable = import nixpkgs-unstable {
+            system = pkgs.stdenv.hostPlatform.system;
+            config.allowUnfree = true;
+          };
+        in
         {
+          imports = [
+            vzm-guest.nixosModules.base
+            vzm-guest.nixosModules.braden
+            home-manager.nixosModules.home-manager
+            ./profile.nix
+            ./nixos/envs.nix
+            ./nixos/docker.nix
+            ./nixos/persist.nix
+            ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
+              vzm.proxy.java.enable = true;
+            })
+          ];
+
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
           home-manager.users.braden.imports = [ ./home/default.nix ];
-        }
-      ];
-    in
-    {
-      nixosConfigurations.default = vzm-guest.lib.mkGuestSystem {
-        inherit system modules;
+        };
+
+      nixosModules.dev = self.nixosModules.default;
+
+      lib = {
+        mkDevGuestSystem =
+          { system ? "aarch64-linux", modules ? [ ] }:
+          vzm-guest.lib.mkGuestSystem {
+            inherit system;
+            modules = [ self.nixosModules.default ] ++ modules;
+          };
+
+        mkGuestBundle = vzm-guest.lib.mkGuestBundle;
       };
 
-      packages.${system}.guest-bundle = vzm-guest.lib.mkGuestBundle {
+      nixosConfigurations.default = self.lib.mkDevGuestSystem {
+        inherit system;
+        modules = if builtins.pathExists ./local.nix then [ ./local.nix ] else [ ];
+      };
+
+      packages.${system}.guest-bundle = self.lib.mkGuestBundle {
         nixosConfiguration = self.nixosConfigurations.default;
       };
     };
