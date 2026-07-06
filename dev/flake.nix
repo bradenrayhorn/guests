@@ -43,19 +43,19 @@
         vzm-guest.nixosModules.braden
         home-manager.nixosModules.home-manager
         ./profile.nix
-        ./modules/envs.nix
-        ./modules/docker.nix
-        ./modules/persist.nix
+        ./nixos/envs.nix
+        ./nixos/docker.nix
+        ./nixos/persist.nix
         ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
           vzm.proxy.java.enable = true;
         })
       ] ++ (if builtins.pathExists ./local.nix then [ ./local.nix ] else [ ]) ++ [
-        ({ pkgs, ... }: {
+        {
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
           home-manager.extraSpecialArgs = { inherit inputs pkgs-unstable; };
-          home-manager.users.braden = import ./modules/home.nix;
-        })
+          home-manager.users.braden.imports = [ ./home/default.nix ];
+        }
       ];
     in
     {

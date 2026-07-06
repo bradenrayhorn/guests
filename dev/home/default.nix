@@ -1,13 +1,9 @@
 {
   pkgs,
-  pkgs-unstable,
   osConfig,
   lib,
   ...
 }:
-let
-  piAgent = import ./pi.nix { inherit pkgs pkgs-unstable; };
-in
 {
   imports = [
     ./git.nix
@@ -15,6 +11,7 @@ in
     ./tmux.nix
     ./zsh.nix
     ./direnv.nix
+    ./pi.nix
   ];
 
   home.username = "braden";
@@ -25,7 +22,6 @@ in
   };
 
   home.packages = [
-    piAgent
     pkgs.ripgrep
     pkgs.fzf
     pkgs.jq
