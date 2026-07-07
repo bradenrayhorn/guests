@@ -5,10 +5,15 @@
   ...
 }:
 let
+  node22 = pkgs.nodejs_22;
+  pnpmNode22 = pkgs.pnpm.override { nodejs = node22; };
+  yarnNode22 = pkgs.yarn.override { nodejs = node22; };
+
   node22Env = pkgs.writeText "node22" ''
-    PATH_add ${lib.getBin pkgs.nodejs_22}/bin
-    PATH_add ${lib.getBin pkgs.pnpm}/bin
-    PATH_add ${lib.getBin pkgs.yarn}/bin
+    # PATH_add prepends, so add node last to keep Node 22 first.
+    PATH_add ${lib.getBin yarnNode22}/bin
+    PATH_add ${lib.getBin pnpmNode22}/bin
+    PATH_add ${lib.getBin node22}/bin
   '';
 
   java21Env = pkgs.writeText "java21" ''
