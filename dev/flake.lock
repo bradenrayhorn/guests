@@ -90,11 +90,11 @@
       },
       "locked": {
         "dir": "guest",
-        "lastModified": 1783028318,
-        "narHash": "sha256-PjVXNprcjzBG7Twqv/fHnr/AtzlrepAFhnsHCTtZwyk=",
+        "lastModified": 1783541512,
+        "narHash": "sha256-+/T/CgXJz+gwJ8wTOHOCMSkzP22/jMEeAWR9ODlVWPs=",
         "owner": "bradenrayhorn",
         "repo": "vzm",
-        "rev": "fd6fc418c647b9553444af6626957c3e612be78e",
+        "rev": "ffa1c3c4d88719877b2379ad0d3beeda5934a7fb",
         "type": "github"
       },
       "original": {
