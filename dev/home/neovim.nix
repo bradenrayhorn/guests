@@ -61,11 +61,13 @@ let
       idea.log.path=\$kotlin_lsp_home/log
       PROPS
 
-      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -Didea.properties.file=\$kotlin_lsp_home/idea.properties"
+      export JAVA_HOME="\''${JAVA_HOME:-${pkgs.jdk21}}"
+      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -Didea.properties.file=\$kotlin_lsp_home/idea.properties -Dcom.jetbrains.ls.imports.gradle.java.home=\$JAVA_HOME"
       export PATH="${
         pkgs.lib.makeBinPath [
           pkgs.coreutils
           pkgs.git
+          pkgs.jdk21
         ]
       }\''${PATH:+:\$PATH}"
 
@@ -167,6 +169,8 @@ let
       ]
       ++ lib.optionals osConfig.profiles.jvm.enable [
         kotlin-lsp
+        # Used by the Kotlin LSP launcher and Gradle project import.
+        jdk21
       ];
   };
 in
