@@ -63,19 +63,24 @@
       set -g bell-action any
       set-option -g visual-bell off
       setw -g mode-keys vi
-      setw -g monitor-activity on
-      set -g visual-activity on
+      setw -g monitor-activity off
+      set -g visual-activity off
       set -g status-style fg=colour15
       set -g status-justify centre
       set -g status-left '''
       set -g status-right '''
       set -g status-interval 1
       set -g message-style fg=colour0,bg=colour3
+
+      # Clear per-window completion indicators, such as pi's green finished
+      # marker, when the window is visited.
+      set-hook -g after-select-window 'set-window-option -u @pi_complete_message; set-window-option -u window-status-style; set-window-option -u window-status-current-style'
+
       setw -g window-status-bell-style fg=colour1
       setw -g window-status-current-style fg=yellow,bold
       setw -g window-status-style fg=colour250
-      setw -g window-status-current-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W} '
-      setw -g window-status-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W} '
+      setw -g window-status-current-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W}#{?#{@pi_complete_message}, #{@pi_complete_message},} '
+      setw -g window-status-format ' #{?#{==:#W,#{b:SHELL}},#{b:pane_current_path},#W}#{?#{@pi_complete_message}, #{@pi_complete_message},} '
     '';
   };
 }

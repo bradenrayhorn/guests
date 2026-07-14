@@ -6,7 +6,7 @@
 }:
 let
   node22 = pkgs.nodejs_22;
-  pnpmNode22 = pkgs.pnpm.override { nodejs = node22; };
+  pnpmNode22 = pkgs.pnpm.override { nodejs-slim = node22; };
   yarnNode22 = pkgs.yarn.override { nodejs = node22; };
 
   node22Env = pkgs.writeText "node22" ''

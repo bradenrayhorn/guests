@@ -32,15 +32,20 @@
     }@inputs:
     let
       system = "aarch64-linux";
+      piCodingAgentOverlay = import ./overlays/pi-coding-agent.nix;
+      mkPkgsUnstable =
+        system:
+        import nixpkgs-unstable {
+          inherit system;
+          config.allowUnfree = true;
+          overlays = [ piCodingAgentOverlay ];
+        };
     in
     {
       nixosModules.default =
         { pkgs, ... }:
         let
-          pkgs-unstable = import nixpkgs-unstable {
-            system = pkgs.stdenv.hostPlatform.system;
-            config.allowUnfree = true;
-          };
+          pkgs-unstable = mkPkgsUnstable pkgs.stdenv.hostPlatform.system;
         in
         {
           imports = [
@@ -51,9 +56,12 @@
             ./nixos/envs.nix
             ./nixos/docker.nix
             ./nixos/persist.nix
-            ({ config, lib, ... }: lib.mkIf config.profiles.jvm.enable {
-              vzm.proxy.java.enable = true;
-            })
+            (
+              { config, lib, ... }:
+              lib.mkIf config.profiles.jvm.enable {
+                vzm.proxy.java.enable = true;
+              }
+            )
           ];
 
           home-manager.useGlobalPkgs = true;
@@ -66,7 +74,10 @@
 
       lib = {
         mkDevGuestSystem =
-          { system ? "aarch64-linux", modules ? [ ] }:
+          {
+            system ? "aarch64-linux",
+            modules ? [ ],
+          }:
           vzm-guest.lib.mkGuestSystem {
             inherit system;
             modules = [ self.nixosModules.default ] ++ modules;
