@@ -9,11 +9,22 @@ let
   pnpmNode22 = pkgs.pnpm.override { nodejs-slim = node22; };
   yarnNode22 = pkgs.yarn.override { nodejs = node22; };
 
+  node24 = pkgs.nodejs_24;
+  pnpmNode24 = pkgs.pnpm.override { nodejs-slim = node24; };
+  yarnNode24 = pkgs.yarn.override { nodejs = node24; };
+
   node22Env = pkgs.writeText "node22" ''
     # PATH_add prepends, so add node last to keep Node 22 first.
     PATH_add ${lib.getBin yarnNode22}/bin
     PATH_add ${lib.getBin pnpmNode22}/bin
     PATH_add ${lib.getBin node22}/bin
+  '';
+
+  node24Env = pkgs.writeText "node24" ''
+    # PATH_add prepends, so add node last to keep Node 24 first.
+    PATH_add ${lib.getBin yarnNode24}/bin
+    PATH_add ${lib.getBin pnpmNode24}/bin
+    PATH_add ${lib.getBin node24}/bin
   '';
 
   java21Env = pkgs.writeText "java21" ''
@@ -30,6 +41,7 @@ in
     rm -rf /var/envs
     mkdir -p /var/envs
     ln -s ${node22Env} /var/envs/node22
+    ln -s ${node24Env} /var/envs/node24
   ''
   + lib.optionalString config.profiles.jvm.enable ''
     ln -s ${java21Env} /var/envs/java21
