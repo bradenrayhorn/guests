@@ -8,10 +8,7 @@
     enable = true;
     initContent = lib.mkOrder 1000 ''
       export PRETTIERD_LOCAL_PRETTIER_ONLY=true
-      if [ -d /caches ]; then
-        export GRADLE_USER_HOME=/caches/gradle
-        export PNPM_HOME=/caches/pnpm
-      fi
+      ${builtins.readFile ./cache-env.sh}
 
       persist_gradle_home=/persist/.gradle
       persist_gradle_properties=$persist_gradle_home/gradle.properties
