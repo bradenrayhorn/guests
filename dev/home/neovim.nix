@@ -79,6 +79,38 @@ let
     '';
   };
 
+  kmp-lsp = pkgs.stdenv.mkDerivation {
+    pname = "kmp-lsp";
+    version = "0.24.0";
+
+    src = pkgs.fetchurl {
+      url = "https://github.com/Hessesian/kmp-lsp/releases/download/v0.24.0/kmp-lsp-linux-aarch64.tar.gz";
+      hash = "sha256-RBnyI26zadrimRUBIspt1Az3LiZrkAHYkXL2QWHkR5k=";
+    };
+
+    # The release archive contains files at its root instead of a single
+    # top-level directory, so the generic unpacker cannot infer sourceRoot.
+    sourceRoot = ".";
+
+    nativeBuildInputs = [ pkgs.autoPatchelfHook ];
+    buildInputs = [
+      pkgs.libgcc.lib
+      pkgs.zlib
+    ];
+
+    dontConfigure = true;
+    dontBuild = true;
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/bin
+      # kmp-lsp finds the native indexer next to its own executable.  Keep
+      # both files in one directory (rather than wrapping either executable).
+      install -m755 kmp-lsp kmp-jar-indexer $out/bin/
+      runHook postInstall
+    '';
+  };
+
   parser = parsers: name: parsers.${name} or parsers.${"tree-sitter-${name}"};
 
   treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (
@@ -166,11 +198,15 @@ let
         gopls
         svelte-language-server
         vtsls
+        ripgrep
       ]
       ++ lib.optionals osConfig.profiles.jvm.enable [
         kotlin-lsp
+        kmp-lsp
         # Used by the Kotlin LSP launcher and Gradle project import.
         jdk21
+        # KMP LSP uses both tools for fast workspace discovery/search.
+        fd
       ];
   };
 in
