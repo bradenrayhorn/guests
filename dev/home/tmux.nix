@@ -1,6 +1,11 @@
-{
-  ...
-}:
+{ pkgs, ... }:
+let
+  acknowledgeAllNotifications = pkgs.writeShellScript "vzm-acknowledge-all-notifications" ''
+    while result="$(vzm-notify acknowledge 2>/dev/null)"; do
+      [ "$result" = "0 pending" ] && break
+    done
+  '';
+in
 {
   programs.tmux = {
     enable = true;
@@ -17,6 +22,10 @@
 
       set -g extended-keys on
       set -g extended-keys-format csi-u
+      set -g focus-events on
+
+      # Acknowledge every VZM guest notification when the terminal regains focus.
+      set-hook -g client-focus-in "run-shell '${acknowledgeAllNotifications}'"
 
       set -g history-limit 50000
       set -g base-index 1

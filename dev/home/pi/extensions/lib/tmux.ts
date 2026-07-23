@@ -1,22 +1,17 @@
-import type { ExtensionAPI } from "@earendil-works/pi-coding-agent";
 import { execFile } from "node:child_process";
 import { promisify } from "node:util";
 
 const execFileAsync = promisify(execFile);
 
 async function tmux(args: string[]) {
-  if (!process.env.TMUX || !process.env.TMUX_PANE) return;
-
   try {
     await execFileAsync("tmux", args, { timeout: 1000 });
   } catch {
-    // Ignore: pi should keep working outside tmux or if tmux is unavailable.
+    // Ignore tmux failures so pi can continue normally.
   }
 }
 
 async function tmuxFormat(target: string, format: string) {
-  if (!process.env.TMUX || !process.env.TMUX_PANE) return undefined;
-
   try {
     const { stdout } = await execFileAsync(
       "tmux",
@@ -29,28 +24,37 @@ async function tmuxFormat(target: string, format: string) {
   }
 }
 
-async function alertTaskComplete() {
+export async function markTmuxWindow(message: string, style: string) {
   const pane = process.env.TMUX_PANE;
-  if (!pane) return;
-
-  // If the pi window is already selected, there is nothing to notify.
-  if ((await tmuxFormat(pane, "#{window_active}")) === "1") return;
+  if (!process.env.TMUX || !pane) return;
 
   await tmux([
     "set-window-option",
     "-t",
     pane,
     "@pi_complete_message",
-    "✓  done",
+    message,
   ]);
 
   for (const option of ["window-status-style", "window-status-current-style"]) {
-    await tmux(["set-window-option", "-t", pane, option, "fg=colour2,bold"]);
+    await tmux(["set-window-option", "-t", pane, option, style]);
   }
 }
 
-export default function (pi: ExtensionAPI) {
-  pi.on("agent_settled", async () => {
-    await alertTaskComplete();
-  });
+export async function getTmuxState() {
+  const pane = process.env.TMUX_PANE;
+  if (!process.env.TMUX || !pane) {
+    return { windowActive: false, clientFocused: false };
+  }
+
+  const [windowActive, clientFlags] = await Promise.all([
+    tmuxFormat(pane, "#{window_active}"),
+    tmuxFormat(pane, "#{client_flags}"),
+  ]);
+
+  return {
+    windowActive: windowActive === "1",
+    clientFocused:
+      clientFlags?.split(",").includes("focused") === true,
+  };
 }
