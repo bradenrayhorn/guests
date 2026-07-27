@@ -27,6 +27,11 @@ let
     PATH_add ${lib.getBin node24}/bin
   '';
 
+  java17Env = pkgs.writeText "java17" ''
+    export JAVA_HOME=${pkgs.jdk17}
+    PATH_add ${lib.getBin pkgs.jdk17}/bin
+  '';
+
   java21Env = pkgs.writeText "java21" ''
     export JAVA_HOME=${pkgs.jdk21}
     PATH_add ${lib.getBin pkgs.jdk21}/bin
@@ -44,6 +49,7 @@ in
     ln -s ${node24Env} /var/envs/node24
   ''
   + lib.optionalString config.profiles.jvm.enable ''
+    ln -s ${java17Env} /var/envs/java17
     ln -s ${java21Env} /var/envs/java21
   '';
 }
