@@ -30,8 +30,13 @@ in
       set -g history-limit 50000
       set -g base-index 1
       set-option -g renumber-windows on
+
+      # Keep window names tied to the working directory
+      set-option -g automatic-rename on
+      set-option -g automatic-rename-format '#{b:pane_current_path}'
+
       set -s escape-time 0
-      bind-key -n M-n new-window -c "#{pane_current_path}"
+      bind-key -n M-n new-window -a -c "#{pane_current_path}"
       bind-key -n M-1 select-window -t :1
       bind-key -n M-2 select-window -t :2
       bind-key -n M-3 select-window -t :3
