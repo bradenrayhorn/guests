@@ -44,7 +44,17 @@ vim.lsp.enable("css_variables")
 
 if nix.jvm_enabled() then
 	vim.lsp.config("kmp_lsp", {
-		cmd = { "kmp-lsp" },
+		-- Cap the LSP and its native jar indexer at one CPU worth of work.
+		-- The systemd scope's quota is inherited by child processes.
+		cmd = {
+			"systemd-run",
+			"--user",
+			"--scope",
+			"--quiet",
+			"--property=CPUQuota=100%",
+			"--",
+			"kmp-lsp",
+		},
 		filetypes = { "kotlin" },
 		root_markers = {
 			"settings.gradle",

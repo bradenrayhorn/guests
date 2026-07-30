@@ -32,13 +32,11 @@
     }@inputs:
     let
       system = "aarch64-linux";
-      piCodingAgentOverlay = import ./overlays/pi-coding-agent.nix;
       mkPkgsUnstable =
         system:
         import nixpkgs-unstable {
           inherit system;
           config.allowUnfree = true;
-          overlays = [ piCodingAgentOverlay ];
         };
     in
     {
@@ -56,6 +54,7 @@
             ./nixos/envs.nix
             ./nixos/docker.nix
             ./nixos/persist.nix
+            ./nixos/swap.nix
             (
               { config, lib, ... }:
               lib.mkIf config.profiles.jvm.enable {

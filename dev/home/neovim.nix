@@ -62,7 +62,8 @@ let
       PROPS
 
       export JAVA_HOME="\''${JAVA_HOME:-${pkgs.jdk21}}"
-      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -Didea.properties.file=\$kotlin_lsp_home/idea.properties -Dcom.jetbrains.ls.imports.gradle.java.home=\$JAVA_HOME"
+      # Size IntelliJ's JVM thread pools for the CPU quota below.
+      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -XX:ActiveProcessorCount=1 -Didea.properties.file=\$kotlin_lsp_home/idea.properties -Dcom.jetbrains.ls.imports.gradle.java.home=\$JAVA_HOME"
       export PATH="${
         pkgs.lib.makeBinPath [
           pkgs.coreutils
@@ -71,7 +72,11 @@ let
         ]
       }\''${PATH:+:\$PATH}"
 
-      exec $out/lib/kotlin-lsp/bin/intellij-server "\$@"
+      # Cap IntelliJ and its newly spawned child processes at one CPU worth
+      # of aggregate work without relying on a particular CPU being available.
+      exec ${pkgs.systemd}/bin/systemd-run --user --scope --quiet \
+        --property=CPUQuota=100% \
+        -- $out/lib/kotlin-lsp/bin/intellij-server "\$@"
       EOF
       chmod +x $out/bin/intellij-server
 
@@ -180,6 +185,7 @@ let
       arrow = plugin "arrow-nvim" pkgs.vimPlugins.arrow-nvim;
       lspconfig = plugin "nvim-lspconfig" pkgs.vimPlugins.nvim-lspconfig;
       blinkcmp = plugin "blink-cmp" pkgs.vimPlugins.blink-cmp;
+      fugitive = plugin "fugitive" pkgs.vimPlugins.vim-fugitive;
     };
 
     runtimePkgs =
@@ -205,8 +211,9 @@ let
         kmp-lsp
         # Used by the Kotlin LSP launcher and Gradle project import.
         jdk21
-        # KMP LSP uses both tools for fast workspace discovery/search.
         fd
+        # Provides systemd-run for the KMP LSP's CPU-limited user scope.
+        systemd
       ];
   };
 in
