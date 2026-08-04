@@ -4,3 +4,5 @@ Most programs should already work. If a program doesn't, point it out and a sugg
 The VM runs NixOS. If you need a specific tool, you can use `nix shell` to access it.
 Prefer already installed and available tools to downloading new ones.
 
+Output tokens are precious, be succinct in your responses. Use ASD-STE100 simplified technical English.
+
