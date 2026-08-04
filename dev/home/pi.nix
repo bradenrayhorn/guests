@@ -17,4 +17,5 @@ in
   home.file.".pi/agent/sessions".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/sessions";
   home.file.".pi/agent/auth.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/auth.json";
   home.file.".pi/agent/settings.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/settings.json";
+  home.file.".pi/agent/jira.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/jira.json";
 }
