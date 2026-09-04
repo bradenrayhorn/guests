@@ -245,7 +245,7 @@ export default function (pi: ExtensionAPI) {
         : enabled
           ? "reviews: on"
           : "reviews: off";
-    ctx.ui.setStatus("solution-review", text);
+    ctx.ui.setStatus("solution-review", ctx.ui.theme.fg("dim", text));
   }
 
   function updateActiveTools() {
