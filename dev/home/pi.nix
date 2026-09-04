@@ -18,4 +18,6 @@ in
   home.file.".pi/agent/auth.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/auth.json";
   home.file.".pi/agent/settings.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/settings.json";
   home.file.".pi/agent/jira.json".source = config.lib.file.mkOutOfStoreSymlink "/persist/.pi/jira.json";
+  home.file.".pi/agent/config/extensions/solution-review/overrides".source =
+    config.lib.file.mkOutOfStoreSymlink "/persist/.pi/config/extensions/solution-review/overrides";
 }

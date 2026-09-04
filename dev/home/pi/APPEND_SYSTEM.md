@@ -6,3 +6,5 @@ Prefer already installed and available tools to downloading new ones.
 
 Output tokens are precious, be succinct in your responses. Use ASD-STE100 simplified technical English.
 
+When coding, take care to not overengineer and do not gold plate.
+
