@@ -199,6 +199,9 @@ let
         prettierd
 
         # lsp
+        go
+        vscode-langservers-extracted
+        css-variables-language-server
         nil
         eslint
         gopls
