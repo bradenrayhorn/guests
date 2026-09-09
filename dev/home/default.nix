@@ -18,6 +18,16 @@ let
         --set NPM_CONFIG_USERCONFIG /persist/npm/.npmrc
     '';
   });
+
+  osccopy = pkgs.writeShellApplication {
+    name = "osccopy";
+    runtimeInputs = [ pkgs.coreutils ];
+    text = ''
+      printf '\033]52;c;'
+      base64 | tr -d '\n'
+      printf '\a'
+    '';
+  };
 in
 {
   imports = [
@@ -46,6 +56,7 @@ in
     pkgs.fzf
     pkgs.jq
     pkgs.curl
+    osccopy
   ];
 
   home.file = lib.optionalAttrs osConfig.profiles.jvm.enable {
