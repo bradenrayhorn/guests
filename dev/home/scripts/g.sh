@@ -6,10 +6,9 @@ g() {
   case "$cmd" in
     switch)
       local target
-      target=$(find /data/git -type d -name .git -prune 2>/dev/null | \
-        while read -r git_dir; do
-          dirname "$git_dir"
-        done | \
+      # Search through groups, but don't descend into discovered repos.
+      target=$(find /data/git -type d \
+        -exec test -d '{}/.git' \; -print -prune 2>/dev/null | \
         fzf --prompt="repo > ")
 
       [[ -n "$target" ]] && cd "$target"
