@@ -28,12 +28,12 @@ let
   '';
 
   java17Env = pkgs.writeText "java17" ''
-    export JAVA_HOME=${pkgs.jdk17}
+    export JAVA_HOME=${pkgs.jdk17.home}
     PATH_add ${lib.getBin pkgs.jdk17}/bin
   '';
 
   java21Env = pkgs.writeText "java21" ''
-    export JAVA_HOME=${pkgs.jdk21}
+    export JAVA_HOME=${pkgs.jdk21.home}
     PATH_add ${lib.getBin pkgs.jdk21}/bin
   '';
 in
