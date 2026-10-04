@@ -7,83 +7,6 @@
 }:
 
 let
-  kotlin-lsp = pkgs.stdenv.mkDerivation rec {
-    pname = "intellij-server";
-    version = "262.8190.0";
-
-    src = pkgs.fetchzip {
-      url = "https://download-cdn.jetbrains.com/language-server/kotlin-server/${version}/kotlin-server-${version}-aarch64.tar.gz";
-      hash = "sha256-SZ/Fjoe5fz8G7OBiTlRKwD8cVLrc674ptSYJ9T/XWic=";
-    };
-
-    nativeBuildInputs = [
-      pkgs.autoPatchelfHook
-    ];
-
-    buildInputs = [
-      pkgs.alsa-lib
-      pkgs.freetype
-      pkgs.libgcc.lib
-      pkgs.libx11
-      pkgs.libxi
-      pkgs.libxrender
-      pkgs.libxtst
-      pkgs.libxkbcommon
-      pkgs.wayland
-      pkgs.zlib
-    ];
-
-    dontConfigure = true;
-    dontBuild = true;
-
-    installPhase = ''
-      runHook preInstall
-
-      mkdir -p $out/lib/kotlin-lsp $out/bin
-      cp -r . $out/lib/kotlin-lsp
-      chmod +x $out/lib/kotlin-lsp/bin/intellij-server
-
-      cat > $out/bin/intellij-server <<EOF
-      #!${pkgs.runtimeShell}
-      set -euo pipefail
-
-      kotlin_lsp_home="\''${KOTLIN_LSP_HOME:-\''${XDG_DATA_HOME:-\$HOME/.local/share}/kotlin-lsp}"
-      mkdir -p "\$kotlin_lsp_home"/{config,system,plugins,log}
-
-      # The JetBrains launcher falls back to /tmp idea-system dirs in this Nix
-      # package unless we provide writable persistent paths.  Keep all IntelliJ
-      # state under one base directory and pass it via JetBrains' stable
-      # idea.properties mechanism instead of baking every path into JVM args.
-      cat > "\$kotlin_lsp_home/idea.properties" <<PROPS
-      idea.config.path=\$kotlin_lsp_home/config
-      idea.system.path=\$kotlin_lsp_home/system
-      idea.plugins.path=\$kotlin_lsp_home/plugins
-      idea.log.path=\$kotlin_lsp_home/log
-      PROPS
-
-      export JAVA_HOME="\''${JAVA_HOME:-${pkgs.jdk21}}"
-      # Size IntelliJ's JVM thread pools for the CPU quota below.
-      export IJ_JAVA_OPTIONS="\''${IJ_JAVA_OPTIONS:-} -XX:ActiveProcessorCount=1 -Didea.properties.file=\$kotlin_lsp_home/idea.properties -Dcom.jetbrains.ls.imports.gradle.java.home=\$JAVA_HOME"
-      export PATH="${
-        pkgs.lib.makeBinPath [
-          pkgs.coreutils
-          pkgs.git
-          pkgs.jdk21
-        ]
-      }\''${PATH:+:\$PATH}"
-
-      # Cap IntelliJ and its newly spawned child processes at one CPU worth
-      # of aggregate work without relying on a particular CPU being available.
-      exec ${pkgs.systemd}/bin/systemd-run --user --scope --quiet \
-        --property=CPUQuota=100% \
-        -- $out/lib/kotlin-lsp/bin/intellij-server "\$@"
-      EOF
-      chmod +x $out/bin/intellij-server
-
-      runHook postInstall
-    '';
-  };
-
   kmp-lsp = pkgs.stdenv.mkDerivation {
     pname = "kmp-lsp";
     version = "0.24.0";
@@ -210,9 +133,8 @@ let
         ripgrep
       ]
       ++ lib.optionals osConfig.profiles.jvm.enable [
-        kotlin-lsp
         kmp-lsp
-        # Used by the Kotlin LSP launcher and Gradle project import.
+        # Used by KMP LSP and Gradle project import.
         jdk21
         fd
         # Provides systemd-run for the KMP LSP's CPU-limited user scope.

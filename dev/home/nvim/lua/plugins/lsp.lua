@@ -68,20 +68,9 @@ if nix.jvm_enabled() then
 		},
 	})
 
-	-- Keep IntelliJ as the compatibility default.  The direct cmd above is
-	-- intentional: Neovim passes its complete environment to kmp-lsp, and the
-	-- indexer it spawns consequently sees HOME, Gradle/Android and proxy vars.
-	local kotlin_lsp = vim.env.KOTLIN_LSP or "kmp"
-	if kotlin_lsp == "intellij" then
-		vim.lsp.enable("kotlin_lsp")
-	elseif kotlin_lsp == "kmp" then
-		vim.lsp.enable("kmp_lsp")
-	else
-		vim.notify(
-			("Invalid KOTLIN_LSP=%q (expected intellij or kmp); Kotlin LSP disabled"):format(kotlin_lsp),
-			vim.log.levels.ERROR
-		)
-	end
+	-- Neovim passes its complete environment to kmp-lsp, so its indexer sees
+	-- HOME, Gradle/Android and proxy vars.
+	vim.lsp.enable("kmp_lsp")
 end
 
 -- key map and other lsp config
