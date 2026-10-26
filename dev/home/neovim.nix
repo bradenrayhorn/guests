@@ -99,7 +99,7 @@ let
     specs = {
       oil = plugin "oil.nvim" pkgs.vimPlugins.oil-nvim;
       snacks = plugin "snacks-nvim" pkgs.vimPlugins.snacks-nvim;
-      gruvbox = plugin "gruvbox" pkgs.vimPlugins.gruvbox;
+      gruvbox = plugin "gruvbox.nvim" pkgs.vimPlugins.gruvbox-nvim;
       conform = plugin "conform.nvim" pkgs.vimPlugins.conform-nvim;
       treesitter = plugin "nvim-treesitter" treesitter;
       autopairs = plugin "nvim-autopairs" pkgs.vimPlugins.nvim-autopairs;
@@ -109,6 +109,8 @@ let
       lspconfig = plugin "nvim-lspconfig" pkgs.vimPlugins.nvim-lspconfig;
       blinkcmp = plugin "blink-cmp" pkgs.vimPlugins.blink-cmp;
       fugitive = plugin "fugitive" pkgs.vimPlugins.vim-fugitive;
+      gitsigns = plugin "gitsigns.nvim" pkgs.vimPlugins.gitsigns-nvim;
+      diffview = plugin "diffview.nvim" pkgs.vimPlugins.diffview-nvim;
     };
 
     runtimePkgs =

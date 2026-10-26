@@ -41,7 +41,7 @@
     in
     {
       nixosModules.default =
-        { pkgs, ... }:
+        { pkgs, lib, ... }:
         let
           pkgs-unstable = mkPkgsUnstable pkgs.stdenv.hostPlatform.system;
         in
@@ -62,6 +62,8 @@
               }
             )
           ];
+
+          boot.kernelPackages = lib.mkForce pkgs.linuxPackages_7_3;
 
           home-manager.useGlobalPkgs = true;
           home-manager.useUserPackages = true;
