@@ -17,12 +17,13 @@ let
 in
 {
   imports = [
+    ./direnv.nix
     ./git.nix
+    ./hunk.nix
     ./neovim.nix
+    ./pi.nix
     ./tmux.nix
     ./zsh.nix
-    ./direnv.nix
-    ./pi.nix
   ];
 
   home.username = "braden";
