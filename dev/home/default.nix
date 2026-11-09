@@ -34,6 +34,8 @@ in
   };
 
   home.packages = [
+    pkgs.beamPackages.elixir
+    pkgs.inotify-tools
     pkgs.ripgrep
     pkgs.fzf
     pkgs.jq

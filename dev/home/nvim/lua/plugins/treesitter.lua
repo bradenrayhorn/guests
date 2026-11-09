@@ -17,6 +17,8 @@ local patterns = {
 	-- go
 	"go",
 	"gomod",
+	-- elixir
+	"elixir",
 	-- web
 	"typescript",
 	"svelte",

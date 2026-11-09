@@ -16,6 +16,7 @@ vim.lsp.config("nil_ls", {
 })
 vim.lsp.enable("nil_ls")
 vim.lsp.enable("gopls")
+vim.lsp.enable("expert")
 
 vim.lsp.config("css_variables", {
 	filetypes = { "css", "svelte" },

@@ -45,7 +45,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = "typescriptreact,typescript,javascript,html,terraform,svelte,json,css,proto,nix",
+	pattern = "typescriptreact,typescript,javascript,html,terraform,svelte,json,css,proto,nix,elixir,eelixir,heex",
 	callback = function()
 		vim.opt_local.shiftwidth = 2
 		vim.opt_local.tabstop = 2

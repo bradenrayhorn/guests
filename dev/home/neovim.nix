@@ -53,6 +53,10 @@ let
         # go
         "go"
         "gomod"
+        # elixir
+        "elixir"
+        "heex"
+        "eex"
         # web
         "typescript"
         "svelte"
@@ -124,6 +128,7 @@ let
         prettierd
 
         # lsp
+        pkgs.beamPackages.expert
         go
         vscode-langservers-extracted
         css-variables-language-server
