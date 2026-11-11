@@ -7,7 +7,7 @@ g() {
     switch)
       local target
       # Search through groups, but don't descend into discovered repos.
-      target=$(find /data/git -type d \
+      target=$(find /data/git -type e \
         -exec test -d '{}/.git' \; -print -prune 2>/dev/null | \
         fzf --prompt="repo > ")
 
