@@ -5,6 +5,7 @@ local nix = require("nix")
 
 require("blink-cmp").setup({
 	keymap = { preset = "enter" },
+	completion = { documentation = { auto_show = true } },
 })
 
 -- setup lsp
@@ -45,14 +46,14 @@ vim.lsp.enable("css_variables")
 
 if nix.jvm_enabled() then
 	vim.lsp.config("kmp_lsp", {
-		-- Cap the LSP and its native jar indexer at one CPU worth of work.
+		-- Cap the LSP and its native jar indexer at two CPUs worth of work.
 		-- The systemd scope's quota is inherited by child processes.
 		cmd = {
 			"systemd-run",
 			"--user",
 			"--scope",
 			"--quiet",
-			"--property=CPUQuota=100%",
+			"--property=CPUQuota=200%",
 			"--",
 			"kmp-lsp",
 		},
